@@ -1,0 +1,166 @@
+[gd_scene load_steps=22 format=2]
+
+[ext_resource path="res://assets/chars/player/player-model.png" type="Texture" id=1]
+[ext_resource path="res://game/player/scripts/Player.gd" type="Script" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 7, 9.5 )
+
+[sub_resource type="Animation" id=2]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 1 ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "idle"
+length = 0.6
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 2, 2, 2, 3, 4, 5 ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "jump"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 11, 12, 13, 14, 15 ]
+}
+
+[sub_resource type="Animation" id=6]
+resource_name = "run"
+length = 0.6
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 5, 6, 7, 8, 9, 10 ]
+}
+
+[sub_resource type="AnimationNodeAnimation" id=18]
+animation = "jump"
+
+[sub_resource type="AnimationNodeAnimation" id=7]
+animation = "idle"
+
+[sub_resource type="AnimationNodeAnimation" id=8]
+animation = "jump"
+
+[sub_resource type="AnimationNodeAnimation" id=9]
+animation = "run"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=10]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=11]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=12]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=14]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=17]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=19]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=20]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=21]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id=15]
+states/double_jump/node = SubResource( 18 )
+states/double_jump/position = Vector2( 553, 125 )
+states/idle/node = SubResource( 7 )
+states/idle/position = Vector2( 161, 107 )
+states/jump/node = SubResource( 8 )
+states/jump/position = Vector2( 334, 186 )
+states/run/node = SubResource( 9 )
+states/run/position = Vector2( 334, 57 )
+transitions = [ "idle", "run", SubResource( 10 ), "run", "idle", SubResource( 11 ), "idle", "jump", SubResource( 12 ), "run", "jump", SubResource( 14 ), "jump", "idle", SubResource( 17 ), "jump", "double_jump", SubResource( 19 ), "double_jump", "idle", SubResource( 20 ), "double_jump", "run", SubResource( 21 ) ]
+start_node = "idle"
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=16]
+
+[node name="Player" type="KinematicBody2D"]
+script = ExtResource( 2 )
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+position = Vector2( 0, 6.5 )
+shape = SubResource( 1 )
+
+[node name="Camera" type="Camera2D" parent="."]
+current = true
+limit_left = -50
+limit_top = -100
+limit_bottom = 300
+limit_smoothed = true
+drag_margin_h_enabled = true
+drag_margin_v_enabled = true
+smoothing_enabled = true
+drag_margin_left = 0.3
+drag_margin_right = 0.3
+editor_draw_limits = true
+editor_draw_drag_margin = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/RESET = SubResource( 2 )
+anims/idle = SubResource( 3 )
+anims/jump = SubResource( 5 )
+anims/run = SubResource( 6 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 0, -16 )
+texture = ExtResource( 1 )
+hframes = 16
+frame = 1
+
+[node name="AnimationMachinePlayer" type="AnimationTree" parent="."]
+tree_root = SubResource( 15 )
+anim_player = NodePath("../AnimationPlayer")
+active = true
+parameters/playback = SubResource( 16 )
+
+[node name="WallDetectorLeft" type="RayCast2D" parent="."]
+position = Vector2( 0, -5 )
+enabled = true
+cast_to = Vector2( -13, 0 )
+
+[node name="WallDetectorRight" type="RayCast2D" parent="."]
+position = Vector2( 0, -5 )
+enabled = true
+cast_to = Vector2( 13, 0 )
